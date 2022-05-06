@@ -1,9 +1,8 @@
 const store = new Vuex.Store({
   state: {
-    adminusername:5,
-    userusername:5,
-    employeeusername:5,
-    key:5,
+    wetwaste:false,
+    drywaste:false,
+
   },
   mutations: {
 
@@ -25,9 +24,9 @@ const homepage = {
       this.$router.push('/employeelogin')
     },
   },
-  template:`<div>    
-    <br><br>
-    This is Home Page</div>`
+  template:`<div> 
+  <img src="./static/Kudawala.GIF">  
+    <br><br></div>`
 }
 
 const adminlogin = {
@@ -151,8 +150,10 @@ const userlogin = {
   },
   template:`<div>
     <br><br><br><br><br>
-    <div class="container-sm border rounded">
+    <div class="container-sm">
+      <img src="./static/new.jpeg">
       <h2>User Login </h2>
+        
         <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
         <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
         <label for="exampleFormControlInput1" class="form-label">Username</label>
@@ -195,14 +196,72 @@ const employeepage = {
 const userpage = {
   data: function() {
     return {
-          }
-        },
+      dry:false,
+      wet:false,
+      premium:true,
+    }
+  },
+  methods:{
+    proceed: async function(){
+      this.$store.state.wetwaste=this.dry;
+      this.$store.state.drywaste=this.wet;
+      this.$router.push('/userpage/wastetype')
+    }
+  },
+  template:`<div>
+    <br><br><br>
+      <div class="container-sm border rounded"> 
+          <h2>Type Of Garbage</h2><br>
+              <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="dry">
+              Dry Waste
+              <br><br>
+              <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="wet">
+              Wet Waste   
+              <br><br>
+            <button type="button" class="btn btn-primary" v-on:click="proceed">Proceed</button>
+              <br><br>
+      </div>
+    </div>`
+}
+
+const wastetype = {
+  data: function(){
+    return{
+
+    }
+  },
   methods:{
 
   },
-  template:`<div>
-    USER PAGE
-    </div>`
+  template:`<div class="container-sm"> 
+                <h2>Select the type of dry waste you are disposing</h2><br>
+                  <div style="text-align:left;">
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  Plastic
+                  <br><br>
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  Cardboard 
+                  <br><br>
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  Polybags
+                  <br><br>
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  All the above  
+                  <br><br>
+                  </div>
+                <h2>Do you want to subscribe for a compost bin for your wet waste?</h2><br>
+                  <div style="text-align:left;">
+                      <input class="form-check-input me-1" type="radio" value="" aria-label="...">
+                      Yes
+                      <br>
+                      <input class="form-check-input me-1" type="radio" value="" aria-label="...">
+                      No<br><br>
+                      <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                      Don't ask me again
+                      <br><br>
+                  </div>
+                  <button type="button" class="btn btn-primary">Proceed</button>
+            </div>`
 }
 
 const routes = [
@@ -213,6 +272,7 @@ const routes = [
 {path :'/adminpage', name: 'adminpage', component: adminpage},
 {path :'/employeepage', name: 'employeepage', component: employeepage},
 {path :'/userpage', name: 'userpage', component: userpage},
+{path :'/userpage/wastetype', name: 'wastetype', component: wastetype}
 ]
 
 const router = new VueRouter({
