@@ -151,18 +151,22 @@ const userlogin = {
   template:`<div>
     <br><br><br><br><br>
     <div class="container-sm">
-      <img src="./static/new.jpeg">
-      <h2>User Login </h2>
-        
-        <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
-        <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
-        <label for="exampleFormControlInput1" class="form-label">Username</label>
-        <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
-        <label for="exampleFormControlInput2" class="form-label">Password</label>
-        <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-        <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
-        <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
+          <div class="row">
+            <div class="col">
+              <img src="./static/new.png">
+            </div>
+            <div class="col" style="background-color:white;">
+              <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
+              <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
+              <label for="exampleFormControlInput1" class="form-label">Username</label>
+              <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
+              <label for="exampleFormControlInput2" class="form-label">Password</label>
+              <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
+              <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+              <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
+              <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
+            </div>
+          </div>
       </div>
     </div>`
 }
@@ -210,7 +214,12 @@ const userpage = {
   },
   template:`<div>
     <br><br><br>
-      <div class="container-sm border rounded"> 
+      <div class="container-sm">
+          <div class="row">
+            <div class="col">
+              <img src="./static/new.png">
+            </div>
+            <div class="col" style="text-align:left; background-color:white ;"> 
           <h2>Type Of Garbage</h2><br>
               <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="dry">
               Dry Waste
@@ -220,6 +229,8 @@ const userpage = {
               <br><br>
             <button type="button" class="btn btn-primary" v-on:click="proceed">Proceed</button>
               <br><br>
+            </div>
+      </div>
       </div>
     </div>`
 }
@@ -233,8 +244,11 @@ const wastetype = {
   methods:{
 
   },
-  template:`<div class="container-sm"> 
-                <h2>Select the type of dry waste you are disposing</h2><br>
+  template:`<div class="container-sm" style="text-align:left;"> 
+              <br><br><br>
+              <div class="row">
+                <div class="col border-end">
+                <h4>Select the type of dry waste you are disposing</h4><br>
                   <div style="text-align:left;">
                   <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
                   Plastic
@@ -249,7 +263,9 @@ const wastetype = {
                   All the above  
                   <br><br>
                   </div>
-                <h2>Do you want to subscribe for a compost bin for your wet waste?</h2><br>
+                </div>
+                <div class="col" style="text-align:left;">
+                <h4>Do you want to subscribe for a compost bin for your wet waste?</h4><br>
                   <div style="text-align:left;">
                       <input class="form-check-input me-1" type="radio" value="" aria-label="...">
                       Yes
@@ -260,7 +276,12 @@ const wastetype = {
                       Don't ask me again
                       <br><br>
                   </div>
-                  <button type="button" class="btn btn-primary">Proceed</button>
+                  
+                </div>
+              </div><br>
+              <div style="text-align:center;">
+              <button type="button" class="btn btn-primary">Proceed</button>
+              </div>
             </div>`
 }
 
