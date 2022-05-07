@@ -345,7 +345,7 @@ const booked ={
 
   },
   template:`<div><br>
-            <h3> We will pick your waste within 8 hrs from now</h3><br><br>
+            <h3> We will pick your waste within 4 hrs from now</h3><br><br>
             <br><br></div>`
 }
 
