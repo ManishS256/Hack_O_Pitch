@@ -150,6 +150,9 @@ const userpage = {
       else{
         alert("Please select atleast one waste type");
       } 
+    },
+    stats: function(){
+      this.$router.push('/userpage/stats')
     }
   },
   template:`<div>
@@ -168,6 +171,11 @@ const userpage = {
               Wet Waste   
               <br><br>
             <button type="button" class="btn btn-primary" v-on:click="proceed">Proceed</button>
+
+
+            <button type="button" class="btn btn-primary" v-on:click="stats">stats</button>
+
+
               <br><br>
             </div>
       </div>
@@ -214,7 +222,12 @@ const wastetype = {
         a= await fetch(url);
         response=await a.json();
         console.log(response)
-        this.$router.push('/userpage/booked')
+        if(response=="Already Booked"){
+          this.$router.push('/userpage/alreadybooked')
+        }
+        else{
+          this.$router.push('/userpage/booked')
+        }
       }
     }
   },
@@ -285,8 +298,13 @@ const payment ={
       url="/api/user/bookings/"+this.$store.state.username+"/"+this.$store.state.societyname+"/"+this.$store.state.key+"/"+this.$store.state.dry_wet+"/"+this.$store.state.plastic+"/"+this.$store.state.cardboard+"/"+this.$store.state.polybags
       a= await fetch(url);
       response=await a.json();
-      console.log(response)
-      this.$router.push('/userpage/booked')
+      console.log(response=="Already Booked")
+      if(response=="Already Booked"){
+        this.$router.push('/userpage/alreadybooked')
+      }
+      else{
+        this.$router.push('/userpage/booked')
+      }
     }
   },
   template:`<div class="container-sm"><br><br><h3>This is the Payments Page</h3>
@@ -307,6 +325,33 @@ const booked ={
             <br><br></div>`
 }
 
+const alreadybooked ={
+  data: function(){
+    return{
+
+    }
+  },
+  methods:{
+
+  },
+  template:`<div><br>
+            <h3> Already Booked. We are Processing on your Pickup</h3><br><br>
+            <br><br></div>`
+}
+
+const stats = {
+  data: function(){
+    return{
+
+    }
+  },
+  methods:{
+
+  },
+  template:`<div>STATS</div>`
+}
+
+
 const routes = [
 {path :'/', name: 'home', component: homepage},
 {path :'/login', name: 'login', component: login},
@@ -316,6 +361,8 @@ const routes = [
 {path :'/userpage/wastetype', name: 'wastetype', component: wastetype},
 {path :'/payment', name: 'payment', component: payment},
 {path :'/userpage/booked', name: 'booked', component: booked},
+{path :'/userpage/alreadybooked', name: 'alreadybooked', component: alreadybooked},
+{path :'/userpage/stats', name: 'stats', component: stats}
 ]
 
 const router = new VueRouter({
@@ -335,3 +382,6 @@ let app = new Vue({
     },
   },
   })
+
+
+

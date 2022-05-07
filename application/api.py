@@ -42,6 +42,9 @@ class BookingAPI(Resource):
       raise InternalServerError(status_code=500)
     if user:
       ct = datetime.now()
+      book=bookings.query.filter_by(username=username,societyname=societyname).first()
+      if(book):
+        return "Already Booked"
       booking=bookings(username=username,societyname=societyname,timestamp=ct,dry_wet_both=typeofwaste,plastic=pl,cardboard=ca,polybags=po)
       db.session.add(booking)
       db.session.commit()
