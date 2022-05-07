@@ -97,27 +97,51 @@ const login = {
 const adminpage = {
   data: function() {
     return {
-          }
-        },
+
+    }
+  },
   methods:{
 
   },
-  template:`<div>
-    ADMIN PAGE
-    </div>`
+  template:`<div>ADMIN PAGE</div>`
 }
 
 const employeepage = {
   data: function() {
     return {
-          }
-        },
+      bookings:[],
+    }
+  },
   methods:{
 
   },
   template:`<div>
-    EMPLOYEE PAGE
-    </div>`
+              <div class="container-sm">
+            <h1>Employee View</h1><br>
+            <h4>Click on the booking to know more about that</h4>
+            <h4>Current Bookings</h4><br>
+            <div >
+              <table class="table table-hover" style="width:75%" align="center">
+                <thead>
+                  <tr>
+                    <th scope="col">Booking #</th>
+                    <th scope="col">Society Name</th>
+                    <th scope="col">User Name</th>
+                    <th scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(bookings, index) in decklist" :key="index">
+                    <th scope="row">BCHN001001</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>`
 }
 
 const userpage = {
