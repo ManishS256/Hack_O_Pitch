@@ -18,21 +18,8 @@ class InternalServerError(HTTPException):
   def __init__(self,status_code):
     self.response=make_response('',status_code)
 
-class AdminLoginAPI(Resource):
-  def get(self,username,password):
-    try:
-      user=admin_login.query.filter_by(username=username,password=password).first()
-    except:
-      raise InternalServerError(status_code=500)
-    if user:
-      key=secrets.token_hex(25)
-      user.key=key
-      db.session.commit()
-      return jsonify({"msg":"Logged in Succesfully","key":key})
-    else:
-      return "Username or Password Doesn't match"
 
-class UserLoginAPI(Resource):
+class LoginAPI(Resource):
   def get(self,societyname,username,password):
     try:
       user=user_login.query.filter_by(username=username,password=password,societyname=societyname).first()
@@ -42,40 +29,25 @@ class UserLoginAPI(Resource):
       key=secrets.token_hex(25)
       user.key=key
       db.session.commit()
-      return jsonify({"msg":"Logged in Succesfully","key":key})
+      return jsonify({"msg":"Logged in Succesfully","key":key,"type":user.user_type})
     else:
       return "Username or Password or Societyname Doesn't match"
 
-class EmployeeLoginAPI(Resource):
-  def get(self,societyname,employeeid,password):
-    try:
-      user=employee_login.query.filter_by(employeeid=employeeid,password=password,societyname=societyname).first()
-    except:
-      raise InternalServerError(status_code=500)
-    if user:
-      key=secrets.token_hex(25)
-      user.key=key
-      db.session.commit()
-      return jsonify({"msg":"Logged in Succesfully","key":key})
-    else:
-      return "Employeeid or Password or Societyname Doesn't match"
 
 class BookingAPI(Resource):
-  def get(self, username, societyname, key, typeofwaste):
+  def get(self, username, societyname, key, typeofwaste, pl, ca, po):
     try:
       user=user_login.query.filter_by(username=username,key=key).first()
     except:
       raise InternalServerError(status_code=500)
     if user:
       ct = datetime.now()
-      booking=bookings(username=username,societyname=societyname,typeofwaste=typeofwaste,timestamp=ct)
+      booking=bookings(username=username,societyname=societyname,timestamp=ct,dry_wet_both=typeofwaste,plastic=pl,cardboard=ca,polybags=po)
       db.session.add(booking)
       db.session.commit()
       return "Booking Successfull"
     else:
       return "Unauthorized user"
 
-api.add_resource(AdminLoginAPI,"/api/adminlogin/<string:username>/<string:password>")
-api.add_resource(UserLoginAPI,"/api/userlogin/<string:username>/<string:password>/<string:societyname>")
-api.add_resource(EmployeeLoginAPI,"/api/employeelogin/<string:employeeid>/<string:password>/<string:societyname>")
-api.add_resource(BookingAPI,"/api/user/bookings/<string:username>/<string:societyname>/<string:key>/<string:typeofwaste>")
+api.add_resource(LoginAPI,"/api/login/<string:username>/<string:password>/<string:societyname>")
+api.add_resource(BookingAPI,"/api/user/bookings/<string:username>/<string:societyname>/<string:key>/<string:typeofwaste>/<string:pl>/<string:ca>/<string:po>")
