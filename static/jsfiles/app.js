@@ -1,8 +1,13 @@
 const store = new Vuex.Store({
   state: {
-    wetwaste:false,
-    drywaste:false,
-
+    username:"",
+    societyname:"",
+    dry_wet:0,
+    key:"",
+    premium:false,
+    plastic:false,
+    cardboard:false,
+    polybags:false,
   },
   mutations: {
 
@@ -11,17 +16,8 @@ const store = new Vuex.Store({
 
 const homepage = {
   methods:{
-    adminlogin: function(){
-      console.log(1111)
-      this.$router.push('/adminlogin')
-    },
-    userlogin: function(){
-      console.log(1111)
+    login: function(){
       this.$router.push('/userlogin')
-    },
-    employeelogin: function(){
-      console.log(1111)
-      this.$router.push('/employeelogin')
     },
   },
   template:`<div> 
@@ -29,97 +25,9 @@ const homepage = {
     <br><br></div>`
 }
 
-const adminlogin = {
-  data: function() {
-    return {adminusername:"",
-            adminpassword:"",
-          }
-        },
-  methods:{
-    submit: async function(){
-      if(this.adminusername=="" || this.adminpassword==""){
-        alert("The Username and password should not be blank");
-      }
-      else if(this.adminusername.search('/') != -1 || this.adminpassword.search('/') != -1){
-        alert("The Username and Password should not contain '/' character");
-      }
-      else{
-        url="/api/adminlogin/"+this.adminusername+"/"+this.adminpassword;
-        a= await fetch(url);
-        response=await a.json();
-        if(response.key){
-          this.$store.state.key=response.key;
-          this.$router.push('/adminpage')
-        }
-        else{
-          console.log("NOT AVAILABLE")
-        }
-      }
-    }
-  },
-  template:`<div>
 
-    <br><br><br><br><br>
-    <div class="container-sm border rounded">
-      <h2>Admin Login </h2>
-        <label for="exampleFormControlInput1" class="form-label">Username</label>
-        <input class="form-control" id="exampleFormControlInput1" v-model="adminusername"><br>
-        <label for="exampleFormControlInput2" class="form-label">Password</label>
-        <input class="form-control" id="exampleFormControlInput2" v-model="adminpassword"><br>
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-        <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
-        <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
-      </div>
-    </div>`
-}
 
-const employeelogin = {
-  data: function() {
-    return {employeeid:"",
-            employeepassword:"",
-            societyname:"",
-          }
-        },
-  methods:{
-    submit: async function(){
-      if(this.employeeid=="" || this.employeepassword==""){
-        alert("The Username and password should not be blank");
-      }
-      else if(this.employeeid.search('/') != -1 || this.employeepassword.search('/') != -1){
-        alert("The Username and Password should not contain '/' character");
-      }
-      else{
-        url="/api/employeelogin/"+this.employeeid+"/"+this.employeepassword+"/"+this.societyname;
-        a= await fetch(url);
-        response=await a.json();
-        if(response.key){
-          this.$store.state.key=response.key;
-          this.$router.push('/employeepage')
-        }
-        else{
-          console.log("NOT AVAILABLE")
-        }
-      }
-    }
-  },
-  template:`<div>
-    <br><br><br><br><br>
-    <div class="container-sm border rounded">
-      <h2>Employee Login </h2>
-        <label for="exampleFormControlInput3" class="form-label">Society Name</label>
-        <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
-        <label for="exampleFormControlInput1" class="form-label">Employee ID</label>
-        <input class="form-control" id="exampleFormControlInput1" v-model="employeeid"><br>
-        <label for="exampleFormControlInput2" class="form-label">Password</label>
-        <input class="form-control" id="exampleFormControlInput2" v-model="employeepassword"><br>
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-        <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
-        <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
-      </div>
-    </div>`
-}
-
-const userlogin = {
+const login = {
   data: function() {
     return {userusername:"",
             userpassword:"",
@@ -135,12 +43,27 @@ const userlogin = {
         alert("The Username and Password should not contain '/' character");
       }
       else{
-        url="/api/employeelogin/"+this.userusername+"/"+this.userpassword+"/"+this.societyname;
+        url="/api/login/"+this.userusername+"/"+this.userpassword+"/"+this.societyname;
         a= await fetch(url);
         response=await a.json();
         if(response.key){
+          this.$store.state.premium=false
           this.$store.state.key=response.key;
-          this.$router.push('/userpage')
+          this.$store.state.username=this.userusername;
+          this.$store.state.societyname=this.societyname;
+          if(response.type==1){
+            this.$router.push('/userpage')
+          }
+          else if(response.type==2){
+            this.$router.push('/employeepage')
+          }
+          else if(response.type==3){
+            this.$router.push('/adminpage')
+          }
+          else if(response.type==4){
+            this.$store.state.premium=true
+            this.$router.push('/userpage')
+          }
         }
         else{
           console.log("NOT AVAILABLE")
@@ -207,9 +130,26 @@ const userpage = {
   },
   methods:{
     proceed: async function(){
-      this.$store.state.wetwaste=this.dry;
-      this.$store.state.drywaste=this.wet;
-      this.$router.push('/userpage/wastetype')
+      url="/api/login/"+this.userusername+"/"+this.userpassword+"/"+this.societyname;
+      a= await fetch(url);
+      response=await a.json();
+
+
+      if(this.dry && this.wet){
+        this.$store.state.dry_wet=3
+        this.$router.push('/userpage/wastetype')
+      }
+      else if(this.dry){
+        this.$store.state.dry_wet=1
+        this.$router.push('/userpage/wastetype')
+      }   
+      else if(this.wet){
+        this.$store.state.dry_wet=2
+        this.$router.push('/userpage/wastetype')
+      }
+      else{
+        alert("Please select atleast one waste type");
+      } 
     }
   },
   template:`<div>
@@ -238,62 +178,144 @@ const userpage = {
 const wastetype = {
   data: function(){
     return{
-
+      drywatse:false,
+      nopremium:false,
+      plastic:false,
+      cardboard:false,
+      polybags:false,
+      alltheabove:false,
+      radio:"",
     }
   },
   methods:{
+    proceed: async function(){
+      if(this.radio=="Yes"){
+        this.$router.push('/payment')
+      }
+      else{
+        if(this.alltheabove){
+          this.$store.state.plastic=true;
+          this.$store.state.cardboard=true;
+          this.$store.state.polybags=true;
+        }
+        else{
+          if(this.plastic){
+            this.$store.state.plastic=true;
+          }
+          if(this.cardboard){
+            this.$store.state.cardboard=true;
+          }
+          if(this.polybags){
+            this.$store.state.polybags=true;
+          }
+        }
 
+        url="/api/user/bookings/"+this.$store.state.username+"/"+this.$store.state.societyname+"/"+this.$store.state.key+"/"+this.$store.state.dry_wet+"/"+this.$store.state.plastic+"/"+this.$store.state.cardboard+"/"+this.$store.state.polybags
+        a= await fetch(url);
+        response=await a.json();
+        console.log(response)
+        this.$router.push('/userpage/booked')
+      }
+    }
+  },
+  beforeMount: function(){
+    if(this.$store.state.dry_wet==1 || this.$store.state.dry_wet==3){
+      this.drywatse=true;
+    }
+    if((!(this.$store.state.premium)) && (this.$store.state.dry_wet==2 || this.$store.state.dry_wet==3)){
+      this.nopremium=true;
+    }
   },
   template:`<div class="container-sm" style="text-align:left;"> 
               <br><br><br>
               <div class="row">
-                <div class="col border-end">
+                <div class="col border-end" v-show="drywatse">
                 <h4>Select the type of dry waste you are disposing</h4><br>
                   <div style="text-align:left;">
-                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="plastic">
                   Plastic
                   <br><br>
-                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="cardboard">
                   Cardboard 
                   <br><br>
-                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="polybags">
                   Polybags
                   <br><br>
-                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                  <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." v-model="alltheabove">
                   All the above  
                   <br><br>
                   </div>
                 </div>
-                <div class="col" style="text-align:left;">
+                <div class="col" style="text-align:left;" v-show="nopremium">
                 <h4>Do you want to subscribe for a compost bin for your wet waste?</h4><br>
                   <div style="text-align:left;">
-                      <input class="form-check-input me-1" type="radio" value="" aria-label="...">
-                      Yes
-                      <br>
-                      <input class="form-check-input me-1" type="radio" value="" aria-label="...">
-                      No<br><br>
-                      <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                      Don't ask me again
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="Yes" v-model="radio">
+                        <label class="form-check-label" for="flexRadioDefault1">
+                          Yes
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="No" v-model="radio">
+                        <label class="form-check-label" for="flexRadioDefault2">
+                          No
+                        </label>
+                      </div>
                       <br><br>
                   </div>
                   
                 </div>
               </div><br>
               <div style="text-align:center;">
-              <button type="button" class="btn btn-primary">Proceed</button>
+              Confirm and place Booking<br>
+              <button type="button" class="btn btn-primary" v-on:click="proceed">Proceed</button>
               </div>
             </div>`
 }
 
+
+const payment ={
+  data: function(){
+    return{
+
+    }
+  },
+  methods:{
+    proceed: async function(){
+      url="/api/user/bookings/"+this.$store.state.username+"/"+this.$store.state.societyname+"/"+this.$store.state.key+"/"+this.$store.state.dry_wet+"/"+this.$store.state.plastic+"/"+this.$store.state.cardboard+"/"+this.$store.state.polybags
+      a= await fetch(url);
+      response=await a.json();
+      console.log(response)
+      this.$router.push('/userpage/booked')
+    }
+  },
+  template:`<div class="container-sm"><br><br><h3>This is the Payments Page</h3>
+              <button type="button" class="btn btn-primary" v-on:click="proceed">Continue</button></div>`
+}
+
+const booked ={
+  data: function(){
+    return{
+
+    }
+  },
+  methods:{
+
+  },
+  template:`<div><br>
+            <h3> We will pick your waste within 8 hrs from now</h3><br><br>
+            <br><br></div>`
+}
+
 const routes = [
 {path :'/', name: 'home', component: homepage},
-{path :'/adminlogin', name: 'adminlogin', component: adminlogin},
-{path :'/userlogin', name: 'userlogin', component: userlogin},
-{path :'/employeelogin', name: 'employeelogin', component: employeelogin},
+{path :'/login', name: 'login', component: login},
 {path :'/adminpage', name: 'adminpage', component: adminpage},
 {path :'/employeepage', name: 'employeepage', component: employeepage},
 {path :'/userpage', name: 'userpage', component: userpage},
-{path :'/userpage/wastetype', name: 'wastetype', component: wastetype}
+{path :'/userpage/wastetype', name: 'wastetype', component: wastetype},
+{path :'/payment', name: 'payment', component: payment},
+{path :'/userpage/booked', name: 'booked', component: booked},
 ]
 
 const router = new VueRouter({
@@ -308,14 +330,8 @@ let app = new Vue({
     router:router,
     store:store,
     methods:{
-    adminlogin: function(){
-      this.$router.push('/adminlogin')
-    },
-    userlogin: function(){
-      this.$router.push('/userlogin')
-    },
-    employeelogin: function(){
-      this.$router.push('/employeelogin')
+    login: function(){
+      this.$router.push('/login')
     },
   },
   })
