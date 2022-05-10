@@ -561,6 +561,17 @@ const stats = {
   template:`<div>STATS</div>`
 }
 
+const pickup = {
+  data: function(){
+    return{
+
+    }
+  },
+  methods:{
+
+  },
+  template:`<div>PICKUP PAGE</div>`
+}
 
 const routes = [
 {path :'/', name: 'home', component: homepage},
@@ -572,7 +583,8 @@ const routes = [
 {path :'/payment', name: 'payment', component: payment},
 {path :'/userpage/booked', name: 'booked', component: booked},
 {path :'/userpage/alreadybooked', name: 'alreadybooked', component: alreadybooked},
-{path :'/userpage/stats', name: 'stats', component: stats}
+{path :'/userpage/stats', name: 'stats', component: stats},
+{path :'/employeepage/:username'}
 ]
 
 const router = new VueRouter({
