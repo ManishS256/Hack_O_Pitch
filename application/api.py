@@ -53,7 +53,7 @@ class BookingAPI(Resource):
       return "Unauthorized user"
 
 class AddUserAPI(Resource):
-  def get(self, username, societyname, password, user_type, adminusername, adminkey):
+  def get(self, username, societyname, password, user_type, adminusername, adminkey, ho, co, dn, pn, apn, eid):
     try:
       admin=user_login.query.filter_by(username=adminusername,key=adminkey,user_type=3).first()
     except:
@@ -69,10 +69,54 @@ class AddUserAPI(Resource):
         user=user_login(username=username,societyname=societyname,password=password,user_type=user_type)
         db.session.add(user)
         db.session.commit()
+        userdata=user_data(username=username,societyname=societyname,subscription=1,house_owner=ho,current_occupant=co,door_no=dn,phone_no=pn,alternate_phone_no=apn,email_id=eid)
+        db.session.add(userdata)
+        db.session.commit()
         return "User Added"
     else:
       return "Unauthorized User"
 
+class RemoveUserAPI(Resource):
+  def get(self, username, societyname, adminusername, adminkey):
+    try:
+      admin=user_login.query.filter_by(username=adminusername,key=adminkey,user_type=3).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(admin):
+      try:
+        user=user_login.query.filter_by(username=username,societyname=societyname).first()
+        if(user):
+          user_login.query.filter_by(username=username,societyname=societyname).delete()
+          user_data.query.filter_by(username=username,societyname=societyname).delete()
+          db.session.commit()
+          return "User Deleted"
+        else:
+          return "Username doesn't exist"
+      except:
+        raise InternalServerError(status_code=500)
+    else:
+      return "Unauthorized User"
+
+class BookingListAPI(Resource):
+  def get(self, username, societyname, key):
+    try:
+      employee=user_login.query.filter_by(username=username,societyname=societyname,key=key).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(employee):
+      bookinglist=bookings.query.filter_by(societyname=societyname).all()
+      if(len(bookinglist)==0):
+        return "No Bookings Available"
+      l=[]
+      for i in bookinglist:
+        l.append({"username":i.username,"societyname":i.societyname,"timestamp":i.timestamp,"booking_id":i.booking_id})
+      return l
+    else:
+      return "Unauthorized User"
+      
+
 api.add_resource(LoginAPI,"/api/login/<string:username>/<string:password>/<string:societyname>")
 api.add_resource(BookingAPI,"/api/user/bookings/<string:username>/<string:societyname>/<string:key>/<string:typeofwaste>/<string:pl>/<string:ca>/<string:po>")
-api.add_resource(AddUserAPI,"/api/admin/adduser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>/<string:password>/<string:user_type>")
+api.add_resource(AddUserAPI,"/api/admin/adduser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>/<string:password>/<string:user_type>/<string:ho>/<string:co>/<string:dn>/<string:pn>/<string:apn>/<string:eid>")
+api.add_resource(RemoveUserAPI,"/api/admin/deleteuser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>")
+api.add_resource(BookingListAPI,"/api/employee/bookings/<string:username>/<string:societyname>/<string:key>")

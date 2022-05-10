@@ -18,10 +18,35 @@ class user_login(db.Model):
 
 class bookings(db.Model):
 	__tablename__='bookings'
-	username=db.Column(db.String, db.ForeignKey("user_login.username"), primary_key=True)
-	societyname=db.Column(db.String, db.ForeignKey("user_login.societyname"), primary_key=True)
+	username=db.Column(db.String, db.ForeignKey("user_login.username"))
+	societyname=db.Column(db.String, db.ForeignKey("user_login.societyname"))
 	dry_wet_both=db.Column(db.Integer)
 	timestamp=db.Column(db.String)
 	plastic=db.Column(db.String)
 	cardboard=db.Column(db.String)
 	polybags=db.Column(db.String)
+	booking_id=db.Column(db.Integer, primary_key=True)
+
+class user_data(db.Model):
+	__tablename__='user_data'
+	username=db.Column(db.String, db.ForeignKey("user_login.username"), primary_key=True)
+	societyname=db.Column(db.String, db.ForeignKey("user_login.societyname"), primary_key=True)
+	subscription=db.Column(db.Numeric)
+	net_dry_waste=db.Column(db.Numeric)
+	net_wet_waste=db.Column(db.Numeric)
+	userlevel=db.Column(db.Integer)
+	net_dry_plastic=db.Column(db.Numeric)
+	net_dry_cardboard=db.Column(db.Numeric)
+	net_exchange=db.Column(db.Numeric)
+	net_ex_newspaper=db.Column(db.Numeric)
+	net_ex_metal=db.Column(db.Numeric)
+	net_ex_notebooks=db.Column(db.Numeric)
+	net_ex_magazine=db.Column(db.Numeric)
+	net_ex_ewaste=db.Column(db.Numeric)
+	net_ex_plastic=db.Column(db.Numeric)
+	house_owner=db.Column(db.String)
+	current_occupant=db.Column(db.String)
+	door_no=db.Column(db.String)
+	phone_no=db.Column(db.String)
+	alternate_phone_no=db.Column(db.String)
+	email_id=db.Column(db.String)

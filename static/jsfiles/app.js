@@ -72,48 +72,231 @@ const login = {
     }
   },
   template:`<div>
-    <br><br><br><br><br>
-    <div class="container-sm">
-          <div class="row">
-            <div class="col">
-              <img src="./static/new.png">
-            </div>
-            <div class="col" style="background-color:white;">
-              <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
-              <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
-              <label for="exampleFormControlInput1" class="form-label">Username</label>
-              <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
-              <label for="exampleFormControlInput2" class="form-label">Password</label>
-              <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-              <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
-              <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
-            </div>
-          </div>
-      </div>
-    </div>`
-}
+              <br><br><br><br><br>
+              <div class="container-sm">
+                    <div class="row">
+                      <div class="col">
+                        <img src="./static/new.png">
+                      </div>
+                      <div class="col" style="background-color:white;">
+                        <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
+                        <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
+                        <label for="exampleFormControlInput1" class="form-label">Username</label>
+                        <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
+                        <label for="exampleFormControlInput2" class="form-label">Password</label>
+                        <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
+                        <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
+                      </div>
+                    </div>
+                </div>
+              </div>`
+          }
 
 const adminpage = {
   data: function() {
     return {
-
+      adduser:false,
+      removeuser:false,
+      viewreport:false,
+      addusername:"",
+      addpassword:"",
+      houseowner:"",
+      currentlyoccupied:"",
+      doorno:"",
+      phone:"",
+      alternatephone:"",
+      email:"",
+      removeusername:"",
     }
   },
   methods:{
-
+    op1: function(){
+      this.adduser=true;
+      this.removeuser=false;
+      this.viewreport=false;
+    },
+    op2: function(){
+      this.adduser=false;
+      this.removeuser=true;
+      this.viewreport=false;
+    },
+    op3: function(){
+      this.adduser=false;
+      this.removeuser=false;
+      this.viewreport=true;
+    },
+    reset: function(){
+      this.addusername="";
+      this.addpassword="";
+      this.houseowner="";
+      this.currentlyoccupied="";
+      this.phone="";
+      this.alternatephone="";
+      this.email="";
+      this.doorno="";
+    },
+    register: async function(){
+      if(this.addusername==""||this.addpassword==""||this.phone==""||this.alternatephone==""||this.houseowner==""||this.doorno==""||this.currentlyoccupied==""){
+        alert("Excluding emial all other fields needs to be filled");
+      }
+      else{
+        url="/api/admin/adduser/"+this.$store.state.username+"/"+this.$store.state.key+"/"+this.addusername+"/"+this.$store.state.societyname+"/"+this.addpassword+"/"+"1"+"/"+this.houseowner+"/"+this.currentlyoccupied+"/"+this.doorno+"/"+this.phone+"/"+this.alternatephone+"/"+this.email;
+        a= await fetch(url);
+        response=await a.json();
+        console.log(response);
+        alert("User added");
+        this.reset();
+      }
+    },
+    remove: async function(){
+      if(this.removeusername==""){
+        alert("Provide Username of the user to be removed")
+      }
+      else{
+        url="/api/admin/deleteuser/"+this.$store.state.username+"/"+this.$store.state.key+"/"+this.removeusername+"/"+this.$store.state.societyname;
+        a= await fetch(url);
+        response=await a.json();
+        console.log(response);
+        alert(response);
+        this.removeusername="";
+      }
+    }
   },
-  template:`<div>ADMIN PAGE</div>`
+  template:`  <div>
+    <div style="margin: 2%;">
+      <h1>Admin View</h1><br>
+      <h4>Select your action</h4>  
+      <div class="dropdown" style="padding: 2%;">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          Select an action
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><button class="dropdown-item" v-on:click="op1">Add User</button></li>
+          <li><button class="dropdown-item" v-on:click="op2">Remove User</button></li>
+          <li><button class="dropdown-item" v-on:click="op3">View Report</button></li>
+        </ul>
+      </div>
+      <br><br>
+
+      <!-- This code is for adding a new user by the Admin -->
+      
+      <div v-show="adduser">
+      <h4>New User Details</h4><br>
+        <div class="container-sm border rounded" style="padding: 2%;">
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">House Owner</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="houseowner">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm" >Currently Occupied By</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="currentlyoccupied">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Door Number</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="doorno">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Phone Number</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="phone">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Alternate Phone Number</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="alternatephone">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">eMail ID</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="email">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Username</span>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="addusername">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Password</span>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="addpassword">
+          </div>
+          <div style="text-align: center; padding: 2%;">
+              <button class="btn btn-primary me-md-2" type="button" style="width: auto; " v-on:click="reset">Reset</button>
+              <button class="btn btn-primary" type="button" style="width: auto;" v-on:click="register">Register</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- This code is for Removing a User by the admin -->
+      <div v-show="removeuser">
+      <h4>Remove a User</h4><br>
+      <div >
+        <div class="container-sm border rounded" style="padding: 2%;">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Username</span>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="removeusername">
+          </div>
+          <div style="text-align: center; padding: 2%;">
+              <button class="btn btn-primary" type="button" style="width: auto;" v-on:click="remove">Submit</button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- This code is for Removind a User by the admin -->
+      <div v-show="viewreport">
+      <h4>Report View</h4><br>
+      <div >
+        <div class="container-sm border rounded" style="padding: 2%;">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Select a type of Report</span>
+            <div class="dropdown" style="width: 70%">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" style="width: 100%;text-align: end;">
+                
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" style="width: 100%;">
+                <li><a class="dropdown-item" href="#">Add User</a></li>
+                <li><a class="dropdown-item" href="#">Remove User</a></li>
+                <li><a class="dropdown-item" href="#">View Report</a></li>
+              </ul>
+            </div>
+          </div>
+          <div style="text-align: center; padding: 2%;">
+              <button class="btn btn-primary" type="button" style="width: auto;">Submit</button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+
+    </div>
+    </div>`
 }
 
 const employeepage = {
   data: function() {
     return {
       bookings:[],
+      available:false,
     }
   },
   methods:{
-
+    pickup: async function(i){
+      console.log(i)
+    }
+  },
+  beforeMount: async function(){
+    url="/api/employee/bookings/"+this.$store.state.username+"/"+this.$store.state.societyname+"/"+this.$store.state.key;
+    a= await fetch(url);
+    response=await a.json();
+    if(response=="Unauthorized User"){
+      alert(response)
+    }
+    else if(response=="No Bookings Available"){
+      this.available=false;
+    }
+    else{
+      this.bookings=response;
+      this.available=true;
+    }
   },
   template:`<div>
               <div class="container-sm">
@@ -121,21 +304,24 @@ const employeepage = {
             <h4>Click on the booking to know more about that</h4>
             <h4>Current Bookings</h4><br>
             <div >
-              <table class="table table-hover" style="width:75%" align="center">
+              <div v-show="!(available)"><h3>No Bookings Available</h3></div>
+              <table class="table table-hover" style="width:75%" align="center" v-show="available">
                 <thead>
                   <tr>
                     <th scope="col">Booking #</th>
                     <th scope="col">Society Name</th>
                     <th scope="col">User Name</th>
-                    <th scope="col">Date</th>
+                    <th scope="col">Time Stamp</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(bookings, index) in decklist" :key="index">
-                    <th scope="row">BCHN001001</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
+                  <tr v-for="(booking, index) in bookings" :key="index">
+                    <th scope="row">{{booking.booking_id}}</th>
+                    <td>{{booking.societyname}}</td>
+                    <td>{{booking.username}}</td>
+                    <td>{{booking.timestamp}}</td>
+                    <td><button type="button" class="btn btn-primary" v-on:click="pickup(index)">Pick Up</button></td>
                   </tr>
                 </tbody>
               </table>
