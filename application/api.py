@@ -52,5 +52,27 @@ class BookingAPI(Resource):
     else:
       return "Unauthorized user"
 
+class AddUserAPI(Resource):
+  def get(self, username, societyname, password, user_type, adminusername, adminkey):
+    try:
+      admin=user_login.query.filter_by(username=adminusername,key=adminkey,user_type=3).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(admin):
+      try:
+        user=user_login.query.filter_by(username=username,societyname=societyname).first()
+      except:
+        raise InternalServerError(status_code=500)
+      if user:
+        return "Username Already Used"
+      else:
+        user=user_login(username=username,societyname=societyname,password=password,user_type=user_type)
+        db.session.add(user)
+        db.session.commit()
+        return "User Added"
+    else:
+      return "Unauthorized User"
+
 api.add_resource(LoginAPI,"/api/login/<string:username>/<string:password>/<string:societyname>")
 api.add_resource(BookingAPI,"/api/user/bookings/<string:username>/<string:societyname>/<string:key>/<string:typeofwaste>/<string:pl>/<string:ca>/<string:po>")
+api.add_resource(AddUserAPI,"/api/admin/adduser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>/<string:password>/<string:user_type>")
