@@ -42,10 +42,10 @@ class BookingAPI(Resource):
       raise InternalServerError(status_code=500)
     if user:
       ct = datetime.now()
-      book=bookings.query.filter_by(username=username,societyname=societyname).first()
+      book=bookings.query.filter_by(username=username,societyname=societyname,status="inprogress").first()
       if(book):
         return "Already Booked"
-      booking=bookings(username=username,societyname=societyname,timestamp=ct,dry_wet_both=typeofwaste,plastic=pl,cardboard=ca,polybags=po)
+      booking=bookings(username=username,societyname=societyname,timestamp=ct,dry_wet_both=typeofwaste,plastic=pl,cardboard=ca,polybags=po,status="inprogress")
       db.session.add(booking)
       db.session.commit()
       return "Booking Successfull"
@@ -104,19 +104,67 @@ class BookingListAPI(Resource):
     except:
       raise InternalServerError(status_code=500)
     if(employee):
-      bookinglist=bookings.query.filter_by(societyname=societyname).all()
+      bookinglist=bookings.query.filter_by(status="inprogress").all()
       if(len(bookinglist)==0):
         return "No Bookings Available"
       l=[]
       for i in bookinglist:
-        l.append({"username":i.username,"societyname":i.societyname,"timestamp":i.timestamp,"booking_id":i.booking_id})
+        l.append({"username":i.username,"societyname":i.societyname,"timestamp":i.timestamp,"booking_id":i.booking_id, "dry_wet_both":i.dry_wet_both})
       return l
     else:
       return "Unauthorized User"
-      
+
+class AddEmployeeAPI(Resource):
+  def get(self, username, societyname, password, adminusername, adminkey):
+    try:
+      user=user_login.query.filter_by(username=adminusername,key=adminkey,societyname=societyname).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(user):
+      usr=user_login.query.filter_by(username=username, societyname=societyname).first()
+      if(usr):
+        return "Username Already Used"
+      else:
+        user=user_login(username=username,password=password,user_type=2,societyname="-1")
+        db.session.add(user)
+        db.session.commit()
+        return "User Added"
+    else:
+      return "Unauthorized User"
+
+class AddBookingStatusAPI(Resource):
+  def get(self, username, societyname, remarks, employeeusername, employeekey):
+    try:
+      user=user_login.query.filter_by(username=employeeusername, key=employeekey).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(user):
+      book=bookings.query.filter_by(username=username,societyname=societyname,status="inprogress").first()
+      book.remarks=remarks
+      book.status="Done"
+      db.session.commit()
+      return "DONE"
+    else:
+      return "CANT BE UPDATED"
+
+class CheckBookingAPI(Resource):
+  def get(self, username, societyname, key):
+    try:
+      user=user_login.query.filter_by(username=username, key=key, societyname=societyname).first()
+    except:
+      raise InternalServerError(status_code=500)
+    if(user):
+      book=bookings.query.filter_by(username=username,societyname=societyname,status="inprogress").first()
+      if(book):
+        return "ALREADY BOOKED"
+      else:
+        return "NEW BOOKING"
 
 api.add_resource(LoginAPI,"/api/login/<string:username>/<string:password>/<string:societyname>")
 api.add_resource(BookingAPI,"/api/user/bookings/<string:username>/<string:societyname>/<string:key>/<string:typeofwaste>/<string:pl>/<string:ca>/<string:po>")
 api.add_resource(AddUserAPI,"/api/admin/adduser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>/<string:password>/<string:user_type>/<string:ho>/<string:co>/<string:dn>/<string:pn>/<string:apn>/<string:eid>")
 api.add_resource(RemoveUserAPI,"/api/admin/deleteuser/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>")
 api.add_resource(BookingListAPI,"/api/employee/bookings/<string:username>/<string:societyname>/<string:key>")
+api.add_resource(AddEmployeeAPI,"/api/addemployee/<string:adminusername>/<string:adminkey>/<string:username>/<string:societyname>/<string:password>")
+api.add_resource(AddBookingStatusAPI,"/api/addbookingstatus/<string:employeeusername>/<string:employeekey>/<string:username>/<string:societyname>/<string:remarks>")
+api.add_resource(CheckBookingAPI,"/api/checkbookingstatus/<string:username>/<string:societyname>/<string:key>")

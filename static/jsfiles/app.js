@@ -8,6 +8,8 @@ const store = new Vuex.Store({
     plastic:false,
     cardboard:false,
     polybags:false,
+    loggedIn:false,
+    usertype:1,
   },
   mutations: {
 
@@ -25,13 +27,25 @@ const homepage = {
     <br><br></div>`
 }
 
+const contactus = {
+  methods:{
+  },
+  template:`<div>Reach out to us at PARADOX 2022</div>`
+}
 
+const testimonials = {
+  methods:{
+  },
+  template:`<div>Waiting for your testimonials😊</div>`
+}
 
 const login = {
   data: function() {
     return {userusername:"",
             userpassword:"",
             societyname:"",
+            usertype:0,
+            radio11:"1",
           }
         },
   methods:{
@@ -43,55 +57,76 @@ const login = {
         alert("The Username and Password should not contain '/' character");
       }
       else{
+        if(this.radio11=="2"){
+          this.societyname="-1";
+        }
         url="/api/login/"+this.userusername+"/"+this.userpassword+"/"+this.societyname;
         a= await fetch(url);
         response=await a.json();
         if(response.key){
-          this.$store.state.premium=false
+          this.$store.state.premium=false;
+          this.$store.state.loggedIn=true;
           this.$store.state.key=response.key;
           this.$store.state.username=this.userusername;
           this.$store.state.societyname=this.societyname;
           if(response.type==1){
-            this.$router.push('/userpage')
+            this.$store.state.usertype=1;
+            this.$router.push('/')
           }
           else if(response.type==2){
+            this.$store.state.usertype=2;
             this.$router.push('/employeepage')
           }
           else if(response.type==3){
+            this.$store.state.usertype=3;
             this.$router.push('/adminpage')
           }
           else if(response.type==4){
+            this.$store.state.usertype=4;
             this.$store.state.premium=true
-            this.$router.push('/userpage')
+            this.$router.push('/')
           }
         }
         else{
-          console.log("NOT AVAILABLE")
+          this.$store.state.usertype=0;
+          alert("Invalid Credentials")
         }
       }
     }
   },
   template:`<div>
-              <br><br><br><br><br>
-              <div class="container-sm">
-                    <div class="row">
-                      <div class="col">
-                        <img src="./static/new.png">
-                      </div>
-                      <div class="col" style="background-color:white;">
-                        <label for="exampleFormControlInput3" class="form-label" >Society Name</label>
-                        <input class="form-control" id="exampleFormControlInput3" v-model="societyname"><br>
-                        <label for="exampleFormControlInput1" class="form-label">Username</label>
-                        <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
-                        <label for="exampleFormControlInput2" class="form-label">Password</label>
-                        <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Remember me</label><br><br>
-                        <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
-                      </div>
-                    </div>
-                </div>
-              </div>`
+    <br><br><br><br><br>
+    <div class="container-sm">
+          <div class="row">
+            <div class="col">
+              <img src="./static/new.png">
+            </div>
+            <div class="col" style="background-color:white;">
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" value="1" v-model="radio11">
+                <label class="form-check-label" for="inlineRadio1">User</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" value="2" v-model="radio11">
+                <label class="form-check-label" for="inlineRadio2">Employee</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" value="3" v-model="radio11">
+                <label class="form-check-label" for="inlineRadio1">Community Admin</label>
+              </div>
+            </div>
+              <label for="exampleFormControlInput3" class="form-label" v-if="radio11 === '1' || radio11 === '3'">Society Name</label>
+              <input class="form-control" id="exampleFormControlInput3" v-model="societyname" v-if="radio11 === '1' || radio11 === '3'"><br>
+              <label for="exampleFormControlInput1" class="form-label">Username</label>
+              <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
+              <label for="exampleFormControlInput2" class="form-label">Password</label>
+              <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
+              <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
+            </div>
+          </div>
+      </div>
+    </div>`
           }
 
 const adminpage = {
@@ -99,6 +134,7 @@ const adminpage = {
     return {
       adduser:false,
       removeuser:false,
+      addemployee:false,
       viewreport:false,
       addusername:"",
       addpassword:"",
@@ -109,6 +145,8 @@ const adminpage = {
       alternatephone:"",
       email:"",
       removeusername:"",
+      addempname:"",
+      addemppassword:"",
     }
   },
   methods:{
@@ -116,16 +154,25 @@ const adminpage = {
       this.adduser=true;
       this.removeuser=false;
       this.viewreport=false;
+      this.addemployee=false;
     },
     op2: function(){
       this.adduser=false;
       this.removeuser=true;
       this.viewreport=false;
+      this.addemployee=false;
     },
     op3: function(){
       this.adduser=false;
       this.removeuser=false;
       this.viewreport=true;
+      this.addemployee=false;
+    },
+    op4: function(){
+      this.adduser=false;
+      this.removeuser=false;
+      this.viewreport=false;
+      this.addemployee=true;
     },
     reset: function(){
       this.addusername="";
@@ -162,6 +209,24 @@ const adminpage = {
         alert(response);
         this.removeusername="";
       }
+    },
+    resetemp: function(){
+      this.addempname="";
+      this.addemppassword="";
+      this.addempsociety="";
+    },
+    registeremp: async function(){
+      url="/api/addemployee/"+this.$store.state.username+"/"+this.$store.state.key+"/"+this.addempname+"/"+this.$store.state.societyname+"/"+this.addemppassword;
+      a= await fetch(url);
+      response=await a.json();
+      if(response == "Username Already Used" || response == "User Added"){
+          alert(response);
+          this.addempname="";
+          this.addemppassword="";
+      }
+      else{
+        alert("Unauthorized User")
+      }
     }
   },
   template:`  <div>
@@ -175,6 +240,7 @@ const adminpage = {
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
           <li><button class="dropdown-item" v-on:click="op1">Add User</button></li>
           <li><button class="dropdown-item" v-on:click="op2">Remove User</button></li>
+          <li><button class="dropdown-item" v-on:click="op4">Add Employee</button></li>
           <li><button class="dropdown-item" v-on:click="op3">View Report</button></li>
         </ul>
       </div>
@@ -241,6 +307,24 @@ const adminpage = {
       </div>
       </div>
 
+      <div v-show="addemployee">
+      <h4>New Employee Details</h4><br>
+        <div class="container-sm border rounded" style="padding: 2%;">
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm" >Username</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="addempname">
+          </div>
+          <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" style="width: 30%" id="inputGroup-sizing-sm">Password</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="addemppassword">
+          </div>
+          <div style="text-align: center; padding: 2%;">
+              <button class="btn btn-primary me-md-2" type="button" style="width: auto; " v-on:click="resetemp">Reset</button>
+              <button class="btn btn-primary" type="button" style="width: auto;" v-on:click="registeremp">Register</button>
+          </div>
+        </div>
+      </div>
+
       <!-- This code is for Removind a User by the admin -->
       <div v-show="viewreport">
       <h4>Report View</h4><br>
@@ -280,7 +364,7 @@ const employeepage = {
   },
   methods:{
     pickup: async function(i){
-      console.log(i)
+      this.$router.push('/pickuppage/'+this.bookings[i].username+'/'+this.bookings[i].societyname+'/'+this.bookings[i].dry_wet_both)
     }
   },
   beforeMount: async function(){
@@ -321,7 +405,7 @@ const employeepage = {
                     <td>{{booking.societyname}}</td>
                     <td>{{booking.username}}</td>
                     <td>{{booking.timestamp}}</td>
-                    <td><button type="button" class="btn btn-primary" v-on:click="pickup(index)">Pick Up</button></td>
+                    <td><button type="button" class="btn btn-primary" v-on:click="pickup(index)">Accept</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -367,6 +451,7 @@ const userpage = {
   },
   template:`<div>
     <br><br><br>
+    <h1>Welcome {{this.$store.state.username}}</h1><br>
       <div class="container-sm">
           <div class="row">
             <div class="col">
@@ -383,7 +468,7 @@ const userpage = {
             <button type="button" class="btn btn-primary" v-on:click="proceed">Proceed</button>
 
 
-            <button type="button" class="btn btn-primary" v-on:click="stats">stats</button>
+            <button type="button" class="btn btn-primary" v-on:click="stats">Stats</button>
 
 
               <br><br>
@@ -496,7 +581,6 @@ const wastetype = {
             </div>`
 }
 
-
 const payment ={
   data: function(){
     return{
@@ -564,17 +648,58 @@ const stats = {
 const pickup = {
   data: function(){
     return{
-
+      pickupname:this.$route.params.username,
+      pickupsociety:this.$route.params.societyname,
+      tow:this.$route.params.typeofwaste,
+      remarks:"",
     }
   },
   methods:{
-
+    com: async function(){
+      url="/api/addbookingstatus/"+this.$store.state.username+"/"+this.$store.state.key+"/"+this.pickupname+"/"+this.pickupsociety+"/"+"No Concerns";
+      a= await fetch(url);
+      response=await a.json();
+      if(response=="DONE"){
+        this.$router.push('/employeepage')
+      }
+      else{
+        alert("Error Occured")
+        this.$router.push('/employeepage')
+      }
+    },
+    rcom: async function(){
+      url="/api/addbookingstatus/"+this.$store.state.username+"/"+this.$store.state.key+"/"+this.pickupname+"/"+this.pickupsociety+"/"+this.remarks;
+      a= await fetch(url);
+      response=await a.json();
+      if(response=="DONE"){
+        this.$router.push('/employeepage')
+      }
+      else{
+        alert("Error Occured")
+        this.$router.push('/employeepage')
+      }
+    },
   },
-  template:`<div>PICKUP PAGE</div>`
+  template:`<div>
+            <h2>Pick Up Details</h2><br>
+            <div class="container-sm border rounded" style="padding: 2%;">
+            Username: {{this.pickupname}}<br>
+            Address: {{this.pickupsociety}}
+            </div>
+            <div class="container-sm border rounded" style="padding: 2%;">
+                  <div v-if="tow == '1'">Excepted Waste Type: Dry Waste</div>
+                  <div v-if="tow == '2'">Excepted Waste Type: Wet Waste</div>
+                  <div v-if="tow == '3'">Excepted Waste Type: Dry and Wet Waste</div><br>
+                  <textarea v-model="remarks"></textarea><br>
+                  <button type="button" class="btn btn-primary" v-on:click="com">Complete</button>
+                  <button type="button" class="btn btn-primary" v-on:click="rcom">Raise a concern & Complete</button>
+          </div></div>`
 }
 
 const routes = [
 {path :'/', name: 'home', component: homepage},
+{path :'/contactus', name: 'contactus', component: contactus},
+{path :'/testimonials', name: 'testimonials', component: testimonials},
 {path :'/login', name: 'login', component: login},
 {path :'/adminpage', name: 'adminpage', component: adminpage},
 {path :'/employeepage', name: 'employeepage', component: employeepage},
@@ -584,7 +709,7 @@ const routes = [
 {path :'/userpage/booked', name: 'booked', component: booked},
 {path :'/userpage/alreadybooked', name: 'alreadybooked', component: alreadybooked},
 {path :'/userpage/stats', name: 'stats', component: stats},
-{path :'/employeepage/:username'}
+{path :'/pickuppage/:username/:societyname/:typeofwaste', name: 'pickuppage', component: pickup}
 ]
 
 const router = new VueRouter({
@@ -599,11 +724,28 @@ let app = new Vue({
     router:router,
     store:store,
     methods:{
-    login: function(){
-      this.$router.push('/login')
+      login: function(){
+        this.$router.push('/login')
+      },
+      logout: function(){
+        this.$store.state.loggedIn=false;
+        this.$router.push('/');
+      },
+      book: async function(){
+        if(this.$store.state.loggedIn){
+          url="/api/checkbookingstatus/"+this.$store.state.username+"/"+this.$store.state.societyname+"/"+this.$store.state.key;
+          a= await fetch(url);
+          response=await a.json();
+          if(response=="ALREADY BOOKED"){
+            this.$router.push('/userpage/alreadybooked')
+          }
+          else{
+            this.$router.push('/userpage');
+          }
+        }
+        if(this.$store.state.loggedIn===false){
+          this.$router.push('/login');
+        }
+      }
     },
-  },
   })
-
-
-

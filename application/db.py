@@ -26,6 +26,8 @@ class bookings(db.Model):
 	cardboard=db.Column(db.String)
 	polybags=db.Column(db.String)
 	booking_id=db.Column(db.Integer, primary_key=True)
+	status=db.Column(db.String)
+	remarks=db.Column(db.String)
 
 class user_data(db.Model):
 	__tablename__='user_data'
