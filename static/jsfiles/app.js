@@ -22,9 +22,10 @@ const homepage = {
       this.$router.push('/userlogin')
     },
   },
-  template:`<div> 
-  <img src="./static/Kudawala.GIF">  
-    <br><br></div>`
+  template:`<div> <br><br>
+            <div v-show="this.$store.state.loggedIn"> <h1>Welcome {{this.$store.state.username}} </h1></div>
+            <img src="./static/Kudawala.GIF">  
+              <br><br></div>`
 }
 
 const contactus = {
@@ -240,8 +241,8 @@ const adminpage = {
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
           <li><button class="dropdown-item" v-on:click="op1">Add User</button></li>
           <li><button class="dropdown-item" v-on:click="op2">Remove User</button></li>
-          <li><button class="dropdown-item" v-on:click="op4">Add Employee</button></li>
-          <li><button class="dropdown-item" v-on:click="op3">View Report</button></li>
+          <!-- <li><button class="dropdown-item" v-on:click="op4">Add Employee</button></li>
+          // <li><button class="dropdown-item" v-on:click="op3">View Report</button></li> -->
         </ul>
       </div>
       <br><br>
