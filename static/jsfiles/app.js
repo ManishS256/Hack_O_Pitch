@@ -117,12 +117,13 @@ const login = {
                 <label class="form-check-label" for="inlineRadio1">Community Admin</label>
               </div>
             </div>
+              <br>
               <label for="exampleFormControlInput3" class="form-label" v-if="radio11 === '1' || radio11 === '3'">Society Name</label>
               <input class="form-control" id="exampleFormControlInput3" v-model="societyname" v-if="radio11 === '1' || radio11 === '3'"><br>
               <label for="exampleFormControlInput1" class="form-label">Username</label>
               <input class="form-control" id="exampleFormControlInput1" v-model="userusername"><br>
               <label for="exampleFormControlInput2" class="form-label">Password</label>
-              <input class="form-control" id="exampleFormControlInput2" v-model="userpassword"><br>
+              <input class="form-control" id="exampleFormControlInput2" v-model="userpassword" input type = "password"><br>
               <button type="button" class="btn btn-primary" v-on:click="submit">Submit</button><br><br>
             </div>
           </div>
